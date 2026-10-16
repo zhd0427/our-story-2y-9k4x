@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#FBF7F0">
+<title>两周年 · 和你的每一天都值得</title>
+<meta name="description" content="两周年。去见你一趟，路上刚好听完 26 首歌。">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='5' fill='%23FBF7F0'/%3E%3Crect x='4.5' y='4.5' width='23' height='23' rx='2' fill='none' stroke='%23C9753F' stroke-width='1.4'/%3E%3Cpath d='M16 21.6c-3.2-2.1-6-4.6-6-7.2 0-1.9 1.5-3.4 3.4-3.4 1 0 2 .5 2.6 1.3.6-.8 1.6-1.3 2.6-1.3 1.9 0 3.4 1.5 3.4 3.4 0 2.6-2.8 5.1-6 7.2z' fill='%23C9753F'/%3E%3C/svg%3E">
+<script>
+/* 「一屏装得下一屏」的高度只认 window.innerHeight。
+   两个理由：① 不认 svh 这个单位的浏览器（Chromium < 108 / iOS < 15.4 等）
+   会把整条 min-height 判为非法丢掉，分区就完全没有最小高度，第一屏下面直接
+   露出第二屏；② 就算认，svh / lvh / dvh 在各种内嵌 webview 里解释也不一致。
+   写成 CSS 变量最可靠，放在 <style> 之前是为了首次绘制就生效，不会先闪一下。 */
+document.documentElement.style.setProperty('--vh', window.innerHeight + 'px');
+</script>
+<style>
+/* ============================================================
+   两周年纪念日 · 拍立得胶片感 · 异地恋版
+   ------------------------------------------------------------
+   要改的东西全在底部 script 的「配置区」里。
+   照片 / 截图放 photos/ ，歌放 songs/ ，文件名对上即可。
+   ============================================================ */
+
+:root{
+  --paper:#FBF7F0; --paper-deep:#F3EDE3; --kraft:#EFE6D9;
+  --ink:#2E2A26; --ink-soft:#7A7269; --body:#5C544C;   /* ink-soft 压深一档：#8A8178 只有 3.4:1，小字读着费劲 */
+  --amber:#C9753F; --blush:#E8C4B8; --frame:#FFF; --line:#E2D9CC;
+  --shadow:rgba(46,42,38,.14);
+  --font-body:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --font-serif:"Songti SC","STSong","Source Han Serif SC","Noto Serif SC","SimSun",serif;
+  --font-hand:"Kaiti SC","STKaiti","KaiTi","楷体",serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{background:#E7E0D5;font-family:var(--font-body);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+:focus-visible{outline:2px solid var(--amber);outline-offset:2px;border-radius:2px}
+::selection{background:rgba(201,117,63,.16)}
+img{max-width:100%;height:auto}
+
+/* ============================ 一屏一屏翻 ============================
+   滚轮 / 触摸 / 方向键交给下面的脚本，一次手势只走一屏，走完才解锁。
+   比一屏高的分区（地图 / 味道 / 信 …）在屏内自由滚，滚到底再翻下一屏。
+
+   每个分区都撑满一屏。高度用 --vh（= window.innerHeight，见 <head> 里那行
+   脚本），回退值是 100vh —— **绝不能用 100svh 当回退**：浏览器一旦不认 svh
+   这个单位，整条 min-height 会被判为非法并丢弃，分区就完全没有最小高度，
+   第一屏下面立刻露出第二屏。svh 是 Chromium 108 / iOS 15.4 才有的。
+
+   居中只给"一屏装得下"的分区（脚本按实测高度加 .fits）。装不下的从头开始，
+   否则超出部分会顶到屏幕外、永远滚不上去。不用 `safe center`：那是 Chromium
+   111 / Safari 16.4 之后才认的，老一点的环境会被丢掉。 */
+.album > header,.album > section{min-height:var(--vh,100vh);display:flex;flex-direction:column}
+.album > .fits{justify-content:center}
+.album{max-width:480px;margin:0 auto;background:var(--paper);min-height:100vh;position:relative;overflow:hidden;box-shadow:0 0 60px rgba(46,42,38,.10)}
+.album::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.05;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+.wrap{padding:0 28px;position:relative;z-index:2}
+.reveal{opacity:0;transform:translateY(22px);transition:opacity .9s ease,transform .9s cubic-bezier(.22,.9,.3,1)}
+/* 中文排版：标题两行均衡分配，长段落避免末行剩一两个字。
+   不认这两个值的浏览器直接忽略，无害。 */
+.sec-head h2,.hero .sub,.finale .big,.place h4,.cassette .meta .now,.receipt .rhead b{text-wrap:balance}
+.page .text,.letter .body,.place p,.note-hand,.lnote,.snaps-note,.cassette .meta .note,
+.film p,.chat .line,.back,.secret-inner p,.finale .note,.receipt .dish span{text-wrap:pretty}
+.reveal.in{opacity:1;transform:none}
+.section{padding:74px 0}
+.kicker{font-size:11px;letter-spacing:.32em;text-indent:.32em;color:var(--amber);margin:0}
+.sec-head{margin:0 0 30px}
+.sec-head h2{font-family:var(--font-serif);font-size:30px;font-weight:700;margin:10px 0 0}
+.sec-head p{margin:10px 0 0;font-size:14px;color:var(--ink-soft)}
+
+/* ============================ 封面 ============================ */
+.hero{min-height:var(--vh,100vh);display:flex;flex-direction:column;justify-content:center;text-align:center;padding:64px 34px 104px;position:relative}
+.hero::before{content:"";position:absolute;inset:16px;border:1px solid var(--line);pointer-events:none}
+.dust{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1}
+.dust i{position:absolute;display:block;border-radius:50%;background:var(--amber);opacity:.16;animation:float 14s linear infinite}
+@keyframes float{0%{transform:translateY(105vh);opacity:0}12%{opacity:.18}88%{opacity:.14}100%{transform:translateY(-10vh) translateX(30px);opacity:0}}
+.stamp{display:inline-block;font-size:11px;letter-spacing:.34em;text-indent:.34em;color:var(--amber);border:1px solid var(--amber);border-radius:2px;padding:6px 13px 5px;opacity:.9}
+.hero-rule{width:38px;height:1px;background:var(--line);margin:34px auto 0;position:relative}
+.hero-rule::after{content:"";position:absolute;left:50%;top:-2.5px;width:6px;height:6px;border-radius:50%;background:var(--amber);transform:translateX(-50%)}
+.hero .sub{margin:30px auto 0;max-width:340px;font-size:28px;line-height:1.62;letter-spacing:.02em;color:var(--ink);font-family:var(--font-hand)}
+.hero .date{margin-top:38px;font-size:12.5px;letter-spacing:.2em;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.hero .date b{font-weight:500;color:var(--ink)}
+@keyframes heroIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.hero .wrap>*{animation:heroIn .95s cubic-bezier(.22,.9,.3,1) both}
+.hero .wrap>*:nth-child(1){animation-delay:.12s}
+.hero .wrap>*:nth-child(2){animation-delay:.3s}
+.hero .wrap>*:nth-child(3){animation-delay:.48s}
+.hero .wrap>*:nth-child(4){animation-delay:.66s}
+.scroll{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);font-size:11px;letter-spacing:.26em;text-indent:.26em;color:var(--ink-soft);animation:bob 2.6s ease-in-out infinite}
+.scroll span{display:block;margin:8px auto 0;width:1px;height:32px;background:linear-gradient(var(--ink-soft),transparent)}
+@keyframes bob{0%,100%{transform:translate(-50%,0)}50%{transform:translate(-50%,7px)}}
+
+/* ============================ 计数器 ============================ */
+.counter{background:var(--paper-deep);padding:42px 28px 38px;text-align:center;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.counter .lead{font-size:12px;letter-spacing:.3em;text-indent:.3em;color:var(--ink-soft);margin:0}
+.days{font-family:var(--font-serif);font-size:72px;font-weight:700;line-height:1;margin:14px 0 6px;color:var(--amber);font-variant-numeric:tabular-nums}
+.days small{font-size:20px;font-weight:400;margin-left:6px;color:var(--ink)}
+.counter .fine{font-size:13px;color:var(--ink-soft);font-variant-numeric:tabular-nums;margin:0}
+.counter .fine b{color:var(--ink);font-weight:500}
+.counter .meets{margin:22px 0 0;padding-top:20px;border-top:1px dashed var(--line);font-family:var(--font-hand);font-size:15px;color:var(--body);line-height:1.9}
+.counter .meets b{color:var(--amber);font-weight:400;font-family:var(--font-serif);font-size:22px;margin:0 3px}
+
+/* 三座城市 */
+.homeline{margin:22px 0 0;padding-top:18px;border-top:1px dashed var(--line);font-size:12px;letter-spacing:.2em;text-indent:.2em;color:var(--ink-soft)}
+
+/* ============================ 故事书 ============================ */
+.book{padding:76px 0}
+.viewport{overflow:hidden;position:relative;transition:height .45s cubic-bezier(.22,.9,.3,1)}
+.track{display:flex;align-items:flex-start;transition:transform .55s cubic-bezier(.22,.9,.3,1)}
+.page{flex:0 0 100%;padding:0 28px;opacity:.25;transition:opacity .45s ease}
+.page.active{opacity:1}
+.page .when{font-size:12px;letter-spacing:.16em;color:var(--amber);font-variant-numeric:tabular-nums;margin:0}
+.page h3{font-family:var(--font-serif);font-size:23px;font-weight:700;margin:8px 0 12px}
+.page .text{margin:0;font-size:15.5px;color:var(--body);line-height:2}
+.page .text em{font-style:normal;font-family:var(--font-hand);font-size:17px;color:var(--ink)}
+
+.polaroid{margin:20px auto 0;width:100%;max-width:300px;background:var(--frame);padding:11px 11px 0;
+  box-shadow:0 12px 28px -10px var(--shadow),0 2px 6px rgba(46,42,38,.06);cursor:pointer;
+  transform:rotate(-1.5deg);transition:transform .5s cubic-bezier(.22,.9,.3,1)}
+.polaroid:active{transform:rotate(0) scale(.985)}
+.shot{position:relative;width:100%;min-height:210px;background:linear-gradient(150deg,#EFE6DA,#E3D6C6 55%,#F0DFD2);overflow:hidden;display:flex;align-items:center;justify-content:center}
+.shot img{width:100%;height:auto;display:block;filter:saturate(.94) contrast(1.02)}
+.shot:has(> img.ok){min-height:0}
+.polaroid.wide{max-width:344px}
+.shot .hint{text-align:center;color:#A79B8D;font-size:12px;line-height:1.9;font-family:var(--font-hand)}
+.shot .hint svg{display:block;margin:0 auto 6px;opacity:.5}
+img.ok + .hint{display:none}
+.caption{font-family:var(--font-hand);font-size:14px;color:#6B6157;text-align:center;padding:14px 6px 15px;margin:0}
+.back{display:none;font-family:var(--font-hand);font-size:15px;color:var(--amber);text-align:center;padding:30px 16px;background:#FFFDF9;min-height:110px;align-items:center;justify-content:center;line-height:1.95}
+.polaroid.flipped .shot,.polaroid.flipped .caption{display:none}
+.polaroid.flipped .back{display:flex}
+
+/* 穿插卡片：车票 / 聊天 / 口头禅 */
+.extra{margin:22px 0 0}
+.ticket{display:flex;background:#FFFDF9;border:1px solid var(--line);border-radius:3px;overflow:hidden;position:relative}
+.ticket::before,.ticket::after{content:"";position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:var(--paper);transform:translateY(-50%);border:1px solid var(--line)}
+.ticket::before{left:-5px}.ticket::after{right:-5px}
+.ticket .stub{flex:0 0 74px;background:var(--blush);display:flex;align-items:center;justify-content:center;font-family:var(--font-hand);font-size:12px;color:#7A5A50;text-align:center;padding:8px 4px;line-height:1.5}
+.ticket .info{flex:1;padding:12px 14px}
+.ticket .info b{display:block;font-size:14px;font-weight:600}
+.ticket .info span{font-size:12px;color:var(--ink-soft);font-family:var(--font-hand)}
+.chat{background:#FFFDF9;border:1px solid var(--line);border-radius:14px 14px 14px 3px;padding:14px 16px}
+.chat .who{font-size:11px;letter-spacing:.16em;color:var(--amber);margin:0 0 6px}
+.chat .line{margin:0;font-family:var(--font-hand);font-size:16px;line-height:1.9;color:#4A423A}
+.phrase{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:16px 4px;text-align:center}
+.phrase span{font-size:11px;letter-spacing:.24em;color:var(--ink-soft);display:block;margin-bottom:8px}
+.phrase b{font-family:var(--font-hand);font-size:17px;font-weight:400;color:var(--amber)}
+
+.controls{display:flex;align-items:center;justify-content:space-between;margin-top:26px;padding:0 28px}
+.nav{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:transparent;color:var(--ink-soft);font-size:17px;cursor:pointer;transition:all .25s ease}
+.nav:disabled{opacity:.28;cursor:default}
+.nav:not(:disabled):active{background:var(--paper-deep)}
+.progress{font-size:12px;letter-spacing:.14em;color:var(--ink-soft);font-variant-numeric:tabular-nums;margin:0}
+.progress b{color:var(--amber);font-weight:600}
+.spine{display:flex;margin:22px 0 0;padding:0 28px;overflow-x:auto;scrollbar-width:none}
+.spine::-webkit-scrollbar{display:none}
+.spine button{flex:0 0 auto;background:none;border:none;padding:8px 6px 0;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;opacity:.42;transition:opacity .3s ease}
+.spine button.on{opacity:1}
+.spine i{display:block;width:5px;height:5px;border-radius:50%;background:var(--ink-soft)}
+.spine button.on i{background:var(--amber);transform:scale(1.5)}
+.spine u{text-decoration:none;font-size:10px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+.spine button.on u{color:var(--amber)}
+
+/* ============================ 地图 ============================ */
+.mapwrap{position:relative;margin:6px 0 0;background:#FFFDF9;border:1px solid var(--line);border-radius:4px;padding:16px 12px 14px;overflow:hidden}
+.mapwrap svg{display:block;width:100%;height:auto}
+.pin{position:absolute;transform:translate(-50%,-50%);border:none;background:none;padding:0;cursor:pointer;display:grid;place-items:center}
+.pin .dot{border-radius:50%;transition:all .3s ease}
+.pin.small .dot{width:9px;height:9px;background:#FFF;border:1.5px solid var(--amber);box-shadow:0 0 0 3px rgba(201,117,63,.13)}
+.pin.city .dot{width:15px;height:15px;background:var(--amber);box-shadow:0 0 0 6px rgba(201,117,63,.18),0 3px 10px rgba(201,117,63,.35)}
+.pin.city .tag{font-family:var(--font-serif);font-size:14px;font-weight:700;color:var(--ink);top:28px}
+.pin.small .tag{font-size:10.5px;top:22px}
+.pin.on .dot{transform:scale(1.25)}
+.pin .tag{position:absolute;left:50%;transform:translateX(-50%);white-space:nowrap;color:var(--ink-soft);font-family:var(--font-hand)}
+.pin.on .tag{color:var(--amber)}
+.mapwrap .note{position:absolute;right:14px;bottom:10px;font-size:10px;letter-spacing:.16em;color:#C9C0B4;font-family:var(--font-hand)}
+.place{margin-top:18px;border:1px solid var(--blush);background:#FFFDF9;padding:20px;opacity:0;transform:translateY(10px);transition:all .45s ease}
+.place.show{opacity:1;transform:none}
+.place .ph img{width:100%;height:auto;max-height:260px;object-fit:cover;border-radius:2px;display:block;margin:0 0 14px}
+.place .phbox{width:100%;height:110px;background:linear-gradient(150deg,#EFE6DA,#E6D8C8);border-radius:2px;margin:0 0 14px}
+.place h4{font-family:var(--font-serif);font-size:19px;margin:2px 0 4px;font-weight:700}
+.place .when{font-size:11px;letter-spacing:.14em;color:var(--amber);margin:0}
+.place p{margin:9px 0 0;font-size:14.5px;color:var(--body);line-height:1.95;font-family:var(--font-hand)}
+
+/* ============================ 味道 · 小票 ============================ */
+.receipt{background:#FFFDF9;border:1px solid var(--line);padding:22px 20px 18px;position:relative;box-shadow:0 10px 24px -14px var(--shadow)}
+.receipt::after{content:"";position:absolute;left:0;right:0;bottom:-7px;height:7px;
+  background:repeating-linear-gradient(-45deg,#FFFDF9 0 5px,transparent 5px 10px)}
+.receipt .rhead{text-align:center;padding-bottom:14px;border-bottom:1px dashed var(--line)}
+.receipt .rhead b{display:block;font-family:var(--font-serif);font-size:16px;font-weight:700}
+.receipt .rhead span{font-size:10.5px;letter-spacing:.2em;color:var(--ink-soft)}
+.receipt ul{list-style:none;margin:0;padding:0}
+.receipt li{padding:14px 0;border-bottom:1px dotted var(--line);display:flex;align-items:baseline;gap:10px}
+.receipt li:last-child{border-bottom:none}
+.receipt .lead{width:16px;flex:0 0 16px;font-size:11px;color:var(--amber)}
+.receipt .dish{flex:1;min-width:0}
+.receipt .dish b{display:block;font-size:15px;font-weight:600;line-height:1.5}
+.receipt .dish span{display:block;font-size:12.5px;color:var(--ink-soft);font-family:var(--font-hand);margin-top:3px}
+.receipt .where{flex:0 0 auto;font-size:11px;color:var(--ink-soft);text-align:right}
+.receipt li.todo{opacity:.62}
+.receipt li.todo .lead{color:#C4B9AB}
+.receipt li.todo .dish b{text-decoration:none;font-weight:500}
+.receipt .rfoot{margin:16px 0 0;text-align:center;font-size:10.5px;letter-spacing:.2em;text-indent:.2em;color:#BEB4A7}
+
+/* ============================ 声音 · 卡带 ============================ */
+.cassette{background:var(--kraft);border:1px solid var(--line);border-radius:8px;padding:16px;box-shadow:0 12px 26px -14px var(--shadow)}
+.tape{display:flex;align-items:center;gap:12px;background:#36302B;border-radius:4px;padding:13px 15px}
+.reel{width:36px;height:36px;flex:0 0 36px;border-radius:50%;border:3px solid #C9BFB2;position:relative;display:grid;place-items:center}
+.reel::after{content:"";width:12px;height:12px;border-radius:50%;border:2px dashed #8B8075}
+.reel::before{content:"";position:absolute;inset:-3px;border-radius:50%;border:1px solid rgba(201,191,178,.35)}
+.playing .reel{animation:spin 2.6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.tape .window{flex:1;height:30px;background:#57504A;border-radius:2px;display:grid;place-items:center;overflow:hidden}
+.tape .window span{font-size:11.5px;color:#E8DFD3;letter-spacing:.06em;white-space:nowrap;padding:0 8px}
+.cassette .meta{margin:14px 0 0}
+.cassette .meta .now{font-family:var(--font-serif);font-size:19px;font-weight:700;margin:0}
+.cassette .meta .artist{font-size:12px;color:var(--ink-soft);margin:3px 0 0}
+.cassette .meta .note{font-family:var(--font-hand);font-size:14.5px;color:var(--body);margin:9px 0 0;line-height:1.9}
+.bar{margin:14px 0 0;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--amber);transition:width .2s linear}
+.songs{list-style:none;margin:16px 0 0;padding:0}
+.songs li{display:flex;align-items:center;gap:10px;padding:11px 2px;border-top:1px solid var(--line);cursor:pointer}
+.songs li:first-child{border-top:none}
+.songs .no{width:18px;flex:0 0 18px;font-size:11px;color:#BEB4A7;font-variant-numeric:tabular-nums}
+.songs .t{flex:1;min-width:0}
+.songs .t b{display:block;font-size:14px;font-weight:500;line-height:1.5}
+.songs .t span{font-size:11.5px;color:var(--ink-soft)}
+.songs li.on .t b{color:var(--amber)}
+.songs li.on .no{color:var(--amber)}
+.songs .mark{width:12px;flex:0 0 12px;height:12px;border-radius:50%;border:1px solid var(--line)}
+.songs li.on .mark{background:var(--amber);border-color:var(--amber)}
+.tapehint{margin:12px 0 0;font-size:11.5px;color:var(--ink-soft);font-family:var(--font-hand);min-height:18px}
+
+/* ==================== 隔着屏幕的日常（截图） ==================== */
+.snaps{display:grid;grid-template-columns:1fr 1fr;gap:13px;margin-top:2px;align-items:start}
+.snap.wide{grid-column:1/-1}
+.snap{background:#FFFDF9;border:1px solid var(--line);border-radius:18px;padding:9px;box-shadow:0 12px 26px -16px var(--shadow)}
+.snap.dark{background:#2F2A26;border-color:#453E38}
+.snap .bar-top{display:flex;align-items:center;gap:5px;padding:1px 3px 9px;font-size:9.5px;letter-spacing:.1em;color:#BEB4A7}
+.snap.dark .bar-top{color:#8B8075}
+.snap .bar-top i{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55}
+.snap .shotbox{position:relative;width:100%;min-height:150px;border-radius:11px;overflow:hidden;
+  background:linear-gradient(150deg,#EFE6DA,#E3D6C6 55%,#F0DFD2);display:flex;align-items:center;justify-content:center}
+.snap.dark .shotbox{background:linear-gradient(150deg,#3A342E,#2A2522)}
+.snap .shotbox img{width:100%;height:auto;display:block}
+.snap .shotbox .hint{text-align:center;color:#A79B8D;font-size:10.5px;line-height:1.85;font-family:var(--font-hand);padding:0 8px}
+.snap.dark .shotbox .hint{color:#7C736A}
+.snap .shotbox .hint svg{display:block;margin:0 auto 5px;opacity:.5}
+.snap .cap{font-size:11.5px;font-family:var(--font-hand);color:var(--ink-soft);text-align:center;padding:9px 2px 3px;line-height:1.7}
+.snap.dark .cap{color:#9A8F84}
+.snaps-note{margin:24px 0 0;text-align:center;font-family:var(--font-hand);font-size:16px;color:var(--body);line-height:1.95}
+
+/* ==================== 美食照片带 ====================
+   两列错落瀑布流：照片按原始比例排，一张不裁，像贴满一面墙。
+   用 columns 不用 grid —— grid 会强行对齐行高，宽高比一杂就露空档。 */
+.filmstrip{columns:2;column-gap:11px;padding:2px 2px 0;margin:0 0 10px}
+.film{break-inside:avoid;display:inline-block;width:100%;margin:0 0 11px;background:var(--frame);
+  padding:6px 6px 0;border-radius:2px;transform:rotate(-1deg);box-shadow:0 10px 22px -12px var(--shadow)}
+.film:nth-child(even){transform:rotate(1deg)}
+.film .box{position:relative;width:100%;overflow:hidden;border-radius:1px;
+  background:linear-gradient(150deg,#EFE6DA,#E3D6C6)}
+.film .box img{width:100%;height:auto;display:block}
+.film .box .hint{font-size:10.5px;color:#A79B8D;font-family:var(--font-hand);text-align:center;line-height:1.9;padding:26px 8px}
+.film p{margin:7px 0 8px;font-size:11.5px;font-family:var(--font-hand);color:var(--ink-soft);line-height:1.6}
+
+/* ==================== 地图进度 ==================== */
+.mapfoot{margin:16px 0 0;text-align:center;font-size:11.5px;letter-spacing:.14em;text-indent:.14em;color:var(--ink-soft)}
+.mapfoot b{color:var(--amber);font-weight:600;font-variant-numeric:tabular-nums}
+
+/* ==================== 以后要给你买的东西 ====================
+   两样东西各占一张卡。卡头「□ 名称 …… 数量」左对齐、右收尾，
+   和小票那屏（✓ / □ · 吃过 4 · 还欠 2）是同一套语言 ——
+   全站都在说同一件事：我记着。 */
+.likes{display:grid;gap:14px}
+.likecard{background:#FFFDF9;border:1px solid var(--line);padding:16px 16px 15px;border-radius:4px}
+.lhead{display:flex;align-items:baseline;gap:8px;padding-bottom:11px;border-bottom:1px dashed var(--line)}
+.lhead .box{flex:0 0 auto;font-size:11px;color:#C4B9AB}
+.lhead .nm{flex:1;min-width:0;font-size:11.5px;letter-spacing:.24em;color:var(--ink)}
+/* 右列不写规格（"5 个" / "Lolita" 这种像电商选配栏），写一句"想给你买什么"——
+   清单感还在，但读起来是人在说话，不是在列参数。 */
+.lhead .want{flex:0 0 auto;font-size:12.5px;font-family:var(--font-hand);color:var(--ink-soft)}
+.lnote{margin:13px 0 0;text-align:center;font-family:var(--font-hand);font-size:13.5px;color:var(--ink-soft);line-height:1.7}
+.lnote b{color:var(--amber);font-family:var(--font-serif);font-weight:700;font-size:20px;margin:0 3px;font-variant-numeric:tabular-nums}
+
+/* 捏捏：五列网格，一行永远排得下。原来用 flex+wrap，窄屏会掉成 4+1，
+   第二个还居中，看着就像排坏了 —— 而宽屏又是 5 个，各机型不一致。 */
+.squish{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;justify-items:center;margin:22px 0 0}
+.squish button{width:100%;max-width:62px;aspect-ratio:1/1;height:auto;border-radius:50%;border:none;padding:0;
+  cursor:pointer;position:relative;background-color:var(--c);
+  background-image:radial-gradient(circle at 34% 26%,rgba(255,255,255,.5),rgba(255,255,255,0) 62%);
+  box-shadow:inset 0 -6px 11px rgba(90,60,50,.14),inset 0 5px 9px rgba(255,255,255,.55),0 9px 18px -10px var(--shadow);
+  transition:transform .16s cubic-bezier(.34,1.56,.64,1)}
+/* 五官全用百分比定位 —— 球跟着列宽缩放，五官才不会脱位 */
+.squish button i,.squish button u{position:absolute;top:37%;width:9.7%;height:11.3%;border-radius:50%;background:rgba(80,58,52,.6)}
+.squish button i{left:27.4%}.squish button u{right:27.4%;text-decoration:none}
+.squish button b{position:absolute;left:50%;bottom:24%;transform:translateX(-50%);width:24%;height:11.3%;
+  border-radius:0 0 40% 40%/0 0 100% 100%;background:rgba(80,58,52,.4);font-weight:400;font-size:0}
+.squish button:active{transform:scale(.85,.72)}
+.squish button.hit{animation:squishBounce .54s cubic-bezier(.22,.9,.3,1)}
+@keyframes squishBounce{0%{transform:scale(.85,.72)}42%{transform:scale(1.15,.9)}70%{transform:scale(.95,1.05)}100%{transform:scale(1)}}
+/* 裙子：一行五条，格子自适应，窄屏也不会挤掉 */
+/* 裙子：Lolita 那种 —— 蓬裙 + 两层蕾丝荷叶边 + 泡泡袖 + 胸前蝴蝶结。
+   上一版画的是"一条 A 字裙 + 五个色号"，那说的是同款不同色，不是她的款式。
+   款式才是重点，所以只画一条，力气全花在剪影上。 */
+/* 裙子不再画成"挂在钩子上的图标" —— 换成一张拍立得：白框 + 顶部胶带 + 微倾，
+   和故事书那六张同一套语言，意思是"这条裙子还在想象里，先拍张照存着"。
+   下巴留空不写字：手写那句在卡片外面，写两遍就腻了。 */
+.dresspic{position:relative;width:168px;margin:24px auto 0;padding:11px 11px 36px;background:var(--frame);
+  border:1px solid #E9E1D4;border-radius:3px;transform:rotate(-2.4deg);
+  box-shadow:0 14px 26px -16px var(--shadow)}
+.dresspic::before{content:"";position:absolute;top:-9px;left:50%;width:62px;height:18px;margin-left:-31px;
+  background:rgba(201,117,63,.16);border:1px dashed rgba(201,117,63,.34);transform:rotate(-3deg)}
+.dresspic .frame{background:linear-gradient(150deg,#EFE6DA,#E3D6C6 55%,#F0DFD2);border-radius:2px;padding:15px 6px}
+.dresspic svg,.dresspic img{display:block;width:100%;height:auto;border-radius:2px}
+
+/* ==================== 细节层：纸品 / 旁注 / 微交互 ==================== */
+/* 顶部阅读进度 */
+.pbar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:min(480px,100vw);height:2px;z-index:70;pointer-events:none;background:rgba(46,42,38,.045)}
+.pbar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blush),var(--amber));transition:width .12s linear}
+
+/* 手写旁注 */
+.note-hand{margin:16px 0 0;font-family:var(--font-hand);font-size:12.5px;color:#97897B;line-height:1.8;transform:rotate(-.5deg)}
+.note-hand.right{text-align:right}
+
+/* 和纸胶带 */
+.polaroid{position:relative}
+.polaroid::before{content:"";position:absolute;top:-9px;left:50%;width:74px;height:19px;margin-left:-37px;
+  background:rgba(232,196,184,.52);transform:rotate(-3.5deg);box-shadow:0 1px 3px rgba(46,42,38,.09);
+  border-left:1px dashed rgba(255,255,255,.6);border-right:1px dashed rgba(255,255,255,.6)}
+.receipt{position:relative}
+.receipt::before{content:"";position:absolute;top:-10px;left:50%;width:84px;height:19px;margin-left:-42px;
+  background:rgba(214,206,182,.55);transform:rotate(2.2deg);box-shadow:0 1px 3px rgba(46,42,38,.09);
+  border-left:1px dashed rgba(255,255,255,.6);border-right:1px dashed rgba(255,255,255,.6)}
+
+/* 统一暖调胶片色 */
+.shot img,.snap .shotbox img,.film .box img,.place .ph img{filter:saturate(.94) contrast(1.02) sepia(.07) brightness(1.01)}
+.shot img{transition:transform .6s cubic-bezier(.22,.9,.3,1)}
+.polaroid:active .shot img{transform:scale(1.035)}
+
+/* 拍立得背面的日期戳 */
+.back span{display:block}
+.back small{display:block;margin-top:13px;font-family:var(--font-body);font-size:10px;letter-spacing:.2em;color:#C4B9AB;font-variant-numeric:tabular-nums}
+
+/* 点击飘心 */
+.heart{position:fixed;z-index:80;pointer-events:none;color:var(--amber);font-size:15px;line-height:1;
+  transform:translate(-50%,-50%);animation:heartUp 1.25s cubic-bezier(.22,.9,.3,1) forwards}
+@keyframes heartUp{0%{opacity:0;transform:translate(-50%,-50%) scale(.5)}
+  16%{opacity:1;transform:translate(-50%,-72%) scale(1)}
+  100%{opacity:0;transform:translate(-50%,-195%) scale(1.15)}}
+
+/* 卡带时长 */
+.timedisp{margin:9px 0 0;font-size:10.5px;letter-spacing:.12em;color:#BEB4A7;font-variant-numeric:tabular-nums;text-align:right}
+
+/* 信件落款 */
+.letter .where{display:block;margin-top:8px;font-size:13px;color:#A79B8D}
+footer small{display:block;margin-top:7px;font-size:10.5px;letter-spacing:.14em;color:#C9C0B4}
+
+/* ============================ 信 ============================ */
+.letter{margin:74px 0 0;padding:56px 26px 60px;background:var(--paper-deep);border-top:1px solid var(--line);border-bottom:1px solid var(--line);text-align:center}
+.letter .body{margin:26px auto 0;max-width:340px;text-align:left;font-family:var(--font-hand);font-size:17px;line-height:2.15;color:#4A423A}
+.letter .body p{margin:0 0 18px;text-indent:2em}
+.letter .greet{margin:0 0 24px;color:var(--ink);text-indent:0}
+.letter .sign{margin:26px 0 0;text-align:right;font-family:var(--font-hand);font-size:15px;color:var(--ink-soft)}
+.letter .sign #letterDate{display:block;margin-top:6px;font-family:var(--font-body);font-size:11px;letter-spacing:.18em;color:#B3A79A;font-variant-numeric:tabular-nums}
+.letter .where:empty{display:none}
+
+/* ============================ 结尾 ============================ */
+.finale{padding:78px 28px 64px;text-align:center}
+.finale .big{font-family:var(--font-serif);font-size:34px;font-weight:700;margin:0 0 14px;line-height:1.35}
+.finale .note{margin:0 auto;max-width:280px;font-size:14px;color:var(--ink-soft)}
+.btn{margin:38px auto 0;display:inline-block;background:var(--amber);color:#FFF;font-size:15px;letter-spacing:.1em;padding:15px 34px;border-radius:3px;border:none;box-shadow:0 10px 22px -8px rgba(201,117,63,.55);cursor:pointer;font-family:var(--font-body);transition:transform .25s ease}
+.btn:active{transform:translateY(2px)}
+.secret{max-height:0;opacity:0;overflow:hidden;transition:max-height 1.1s ease,opacity .9s ease,margin .6s ease;margin:0 auto}
+.secret.open{max-height:440px;opacity:1;margin-top:42px}
+.secret-inner{border:1px solid var(--blush);padding:32px 24px;background:#FFFDF9}
+.secret-inner .when{font-size:12px;letter-spacing:.16em;color:var(--amber);margin:0}
+.secret-inner p{font-family:var(--font-hand);font-size:16px;line-height:2;margin:12px 0 0;color:#4A423A}
+footer{padding:0 28px 54px;text-align:center;font-size:11px;letter-spacing:.18em;text-indent:.18em;color:#B4AB9F}
+/* 页脚跟着最后一屏一起翻，不然它会单独占一屏、底下空一大块 */
+.finale footer{margin:40px 0 0;padding:26px 0 0;border-top:1px solid var(--line)}
+
+@media (prefers-reduced-motion:reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+  .dust{display:none}.scroll{animation:none}.track{transition:none}
+  .playing .reel{animation:none}
+  .squish button.hit{animation:none;transform:none}
+  .heart{display:none}
+  .shot img{transition:none}
+  .pbar i{transition:none}
+  .squish button{transition:none}
+  .note-hand{transform:none}
+  .hero .wrap>*{animation:none}
+}
+</style>
+</head>
+<body>
+<div class="pbar"><i id="pbar"></i></div>
+<div class="album">
+
+  <!-- 封面 -->
+  <header class="hero">
+    <div class="dust" id="dust"></div>
+    <div class="wrap">
+      <span class="stamp">两 周 年</span>
+      <div class="hero-rule"></div>
+      <h1 class="sub">和你的每一天<br>都值得</h1>
+      <p class="date"><b>2024.10.17</b> &nbsp;—&nbsp; <b>2026.10.17</b></p>
+    </div>
+    <div class="scroll">向 下 滑<span></span></div>
+  </header>
+
+  <!-- 计数器 -->
+  <section class="counter reveal">
+    <p class="lead">我 们 在 一 起</p>
+    <p class="days"><span id="d">0</span><small>天</small></p>
+    <p class="fine"><b id="h">0</b> 小时 &nbsp;·&nbsp; <b id="m">0</b> 分钟 &nbsp;·&nbsp; <b id="s">0</b> 秒</p>
+    <p class="meets">这 <b id="d2">0</b> 天里，去见你一趟，<br>路上刚好听完 <b class="trip">26</b> 首歌。</p>
+    <p class="homeline"><span id="cityPair">杭州 · 北京</span> &nbsp;·&nbsp; <span id="homeCity">南宁</span></p>
+  </section>
+
+  <!-- 故事书 -->
+  <section class="book">
+    <div class="wrap sec-head reveal">
+      <p class="kicker">S T O R Y B O O K</p>
+      <h2>和你在一起的第 <span id="dayNum">730</span> 天</h2>
+      <p>左右滑动翻页 · 点一下照片，背面有话</p>
+    </div>
+    <div class="viewport" id="viewport"><div class="track" id="track"></div></div>
+    <div class="controls">
+      <button class="nav" id="prev" aria-label="上一页">‹</button>
+      <p class="progress"><b id="cur">1</b> / <span id="total">6</span></p>
+      <button class="nav" id="next" aria-label="下一页">›</button>
+    </div>
+    <div class="spine" id="spine"></div>
+    <div class="wrap"><p class="note-hand right">（这些事我一件都没忘）</p></div>
+  </section>
+
+  <!-- 隔着屏幕的日常 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="kicker">B E T W E E N   U S</p>
+        <h2>隔着屏幕的日常</h2>
+        <p>这两年，我们大部分时间是住在手机里的。</p>
+      </div>
+      <div class="snaps" id="snaps"></div>
+      <p class="snaps-note reveal">异地恋的证据，<br>大部分是截图。</p>
+    </div>
+  </section>
+
+  <!-- 地图 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="kicker">A L L   T H E   W A Y</p>
+        <h2>从同一座城市出发</h2>
+        <p>南宁是来处，一个在杭州，一个在北京。</p>
+      </div>
+      <div class="mapwrap" id="mapwrap">
+        <svg viewBox="0 0 100 72" fill="none" preserveAspectRatio="none">
+          <path d="M14 56 C 30 52, 56 48, 84 44" stroke="#E9E0D3" stroke-width=".65" stroke-linecap="round" stroke-dasharray="2.2 2.8"/>
+          <path d="M14 56 C 24 38, 42 20, 58 11" stroke="#E9E0D3" stroke-width=".65" stroke-linecap="round" stroke-dasharray="2.2 2.8"/>
+          <path d="M84 44 C 80 28, 68 15, 58 11" stroke="#C9753F" stroke-opacity=".16" stroke-width="2.8" stroke-linecap="round"/>
+          <path d="M84 44 C 80 28, 68 15, 58 11" stroke="#C9753F" stroke-width=".9" stroke-linecap="round" stroke-dasharray="3 2.6"/>
+        </svg>
+      </div>
+      <p class="mapfoot" id="mapFoot"></p>
+      <div class="place" id="place"></div>
+    </div>
+  </section>
+
+  <!-- 味道 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="kicker">T A S T E</p>
+        <h2>我们隔着屏幕分享过的美食</h2>
+        <p>还没一起吃的，留着下次。</p>
+      </div>
+      <div class="filmstrip" id="filmstrip"></div>
+      <div class="receipt reveal">
+        <div class="rhead"><b>我 们 的 味 道</b><span>TWO YEARS · TWO CITIES</span></div>
+        <ul id="foodList"></ul>
+        <p class="rfoot" id="foodFoot"></p>
+      </div>
+      <p class="note-hand">（还欠你的，我都记着）</p>
+    </div>
+  </section>
+
+  <!-- 声音 -->
+  <section class="section" style="padding-top:84px">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="kicker">S O U N D</p>
+        <h2>我们的歌</h2>
+        <p>点一首听听。</p>
+      </div>
+      <div class="cassette reveal" id="cassette">
+        <div class="tape">
+          <div class="reel"></div>
+          <div class="window"><span id="tapeTitle">—</span></div>
+          <div class="reel"></div>
+        </div>
+        <div class="meta">
+          <p class="now" id="nowTitle">还没开始</p>
+          <p class="artist" id="nowArtist"></p>
+          <p class="note" id="nowNote">从下面选一首。</p>
+        </div>
+        <div class="bar"><i id="bar"></i></div>
+        <p class="timedisp" id="timeDisp">0:00 / --:--</p>
+        <p class="tapehint" id="tapeHint"></p>
+      </div>
+      <ul class="songs" id="songList"></ul>
+    </div>
+  </section>
+
+  <!-- 以后要给你买的东西 -->
+  <section class="section">
+    <div class="wrap">
+      <div class="sec-head reveal">
+        <p class="kicker">T O   B U Y</p>
+        <h2>以后要给你买的东西</h2>
+        <p>还没买，先记着。都会有的。</p>
+      </div>
+      <div class="likes">
+        <div class="likecard reveal">
+          <div class="lhead"><span class="box">□</span><span class="nm">捏 捏</span><span class="want">想给你买一堆</span></div>
+          <div class="squish" id="squishBox"></div>
+          <p class="lnote">已经替你捏了 <b id="squishCount">0</b> 下</p>
+        </div>
+        <div class="likecard reveal">
+          <div class="lhead"><span class="box">□</span><span class="nm">裙 子</span><span class="want">买一衣柜</span></div>
+          <div class="dresspic" id="lolitaBox"></div>
+          <p class="lnote">等买到了，你穿给我看。</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 信 -->
+  <section class="letter reveal">
+    <p class="kicker">写 给 你</p>
+    <div class="body">
+      <p class="greet">可爱美丽的叉宝：</p>
+      <p>其实会有一点不懂怎么下笔写这封信，日子过得好快好快，这就到了两周年了，好像之前去环球还是前几天的事。</p>
+      <p>我感觉这一年我们最大的主题就是留学，从命苦的考雅思，到现在都还在申请。私心下有想幸好我们都是走的这条路，以至于我们的节奏能够基本同步。但是这条路也不好走吧。从啃下雅思，你还要说服你爸同意这件事，然后准备文书哔哩吧啦的。还好你已经拿到大结果了，虽然我还在等待😖。</p>
+      <p>两年真的过得比我想的快。原来想念最先形成的不是情绪，而是习惯。习惯睁开眼第一件事就翻看你的消息，习惯每一餐饭、大大小小的琐事都第一时间分享给你。</p>
+      <p>最后，希望我们能够从从容容开开心心的走入下一年，长长的路我们要慢慢走！</p>
+    </div>
+    <p class="sign">—— zhd<span id="letterDate">2026.10.17</span><span class="where" id="letterWhere"></span></p>
+  </section>
+
+  <!-- 结尾 -->
+  <section class="finale">
+    <h2 class="big reveal">故事还没写完</h2>
+    <p class="note reveal">下面那句话，要你自己点开。</p>
+    <button class="btn" id="unlock">领 取 第 三 年</button>
+    <div class="secret" id="secret">
+      <div class="secret-inner">
+        <p class="when" id="secretWhen">2027.10.17</p>
+        <p id="secretText"></p>
+      </div>
+    </div>
+    <footer>2024.10.17 &nbsp;—&nbsp; 未完待续<small>这个页面会一直改下去</small></footer>
+  </section>
+</div>
+
+<audio id="audio" preload="none"></audio>
+
+<script>
+/* ============================================================
+   ——————————————  配 置 区  ——————————————
+   ============================================================ */
+
+/* ① 在一起的那一天 */
+const START_DATE = '2024-10-17T00:00:00';
+
+/* ② 去见你一趟，路上刚好听完多少首歌（这个数字全站反复出现） */
+const TRIP_SONGS = 26;
+
+/* ③ 三座城市：我住哪、她住哪、家乡在哪 */
+const CITY_A = { name:'杭州', x:84, y:44 };     // 我
+const CITY_B = { name:'北京', x:58, y:11 };     // 她
+const CITY_HOME = { name:'南宁', x:14, y:56 };  // 家乡，两人的来处
+
+/* ④ 地图上一起出门去过的地方（x/y 是百分比，随便挪） */
+const PLACES = [
+  { name:'柳州',   x:28, y:47, when:'第一次',   text:'看到了这条江。',           photo:'photos/p1.jpg' },
+  { name:'徐州',   x:60, y:34, when:'第二次',   text:'吃了这顿烧烤。',           photo:'photos/p2.jpg' },
+  { name:'连云港', x:88, y:22, when:'第三次',   text:'看到了日落。',             photo:'photos/p3.jpg' },
+  { name:'邯郸',   x:42, y:20, when:'最近一次', text:'和你的舍友出了很多神图。', photo:'photos/p4.jpg' }
+];
+
+/* ⑤ 故事书：一页一段回忆
+      extra 可选：ticket 车票 / chat 聊天原话 / phrase 口头禅 */
+const STORY = [
+  {
+    date:'2024.12.01', title:'环球影城',
+    text:'在一起之后，我们第一次一起出去玩。哈利波特、小黄人……',
+    photo:'photos/01.jpg',
+    back:'和你一起去的环球影城，真的很好玩。'
+  },
+  {
+    date:'2025.01.01', title:'第一次跨年',
+    text:'第一次一起跨年。带你来了我们学校，最后还是找了个星巴克坐下写作业。',
+    photo:'photos/02.jpg',
+    back:'我们两个苦逼的大学生，跨年还要在期末周学习。',
+    extra:{type:'ticket', stub:'机票', title:'北京 → 杭州', note:'2025.01.01 · 跨年'}
+  },
+  {
+    date:'2025.02.14', title:'情人节',
+    text:'那天的花是碎冰蓝。车里很暖，导航一直亮着，我们坐了很久才走。',
+    photo:'photos/03.jpg',
+    back:'碎冰蓝很好看，捧着玫瑰的你更好看。'
+  },
+  {
+    date:'2025.07.05', title:'一起看的第一部电影',
+    text:'《名侦探柯南：独眼的残像》',
+    photo:'photos/04.jpg',
+    back:'一如既往地欣赏柯学。'
+  },
+  {
+    date:'2025.10.17', title:'一周年',
+    text:'一周年那天，我们<em>在命苦地备考雅思</em>。',
+    photo:'photos/05.jpg',
+    back:'雅思真的很折磨人吧！但是两个人一起备考，真的不错。'
+  },
+  {
+    date:'2025.12.31', title:'第二次跨年',
+    text:'新荣记真的很好吃！！！',
+    photo:'photos/06.jpg',
+    back:'我们还要去吃新荣记。'
+  }
+];
+
+/* ⑥ 我们吃过的东西（done:false = 还没一起吃，留成待打卡） */
+const FOODS = [
+  { dish:'白月光炒粉',   where:'夜宵摊',       note:'那个摊子，现在已经找不到了 😭', done:true },
+  { dish:'粉胶',         where:'老南宁糖水铺', note:'',                             done:true },
+  { dish:'烧鹅',         where:'新荣记',       note:'',                             done:true },
+  { dish:'蛋糕',         where:'源麦甜',       note:'',                             done:true },
+  { dish:'给你做的饭',   where:'我们的厨房',   note:'',                             done:false },
+  { dish:'还有好多好多', where:'等着我们',     note:'',                             done:false }
+];
+
+/* ⑦ 我们的歌（file 放 songs/ 目录；没有文件会提示，不会假装在播） */
+const SONGS = [
+  { title:'林宛瑜',        artist:'Rapeter',          note:'你推给我的。循环太多次了，现在前奏一响我就知道是你。', file:'songs/01.mp3' },
+  { title:'Daylight',      artist:'Taylor Swift',     note:'你说这首歌像早上。后来每次天要亮的时候，我都会想起这句。', file:'songs/02.mp3' },
+  { title:'从前以后 PT.1', artist:'盛宇 / KEY.L刘聪', note:'这首我到现在还没听腻，单曲循环过很多次。', file:'songs/03.mp3' }
+];
+
+/* ⑧ 隔着屏幕的日常 —— 截图放 photos/ 下
+      label 是卡片左上角那行小字；wide:true 占满整行；kind:'music' 会变深色卡片 */
+const SNAPS = [
+  { kind:'call',  label:'通话记录', photo:'photos/call.jpg',
+    cap:'通话记录 · 一条都没舍得删' },
+  { kind:'music', label:'一起听',   photo:'photos/netease.jpg',
+    cap:'网易云 · 一起听<br>同一首歌，同一个进度条' },
+  { kind:'days',  label:'倒数日',   photo:'photos/daysmatter.jpg', wide:true,
+    cap:'这个数，不止我在数' }
+];
+
+/* ⑨ 美食照片（3 列网格，想加多少加多少）
+      name 留空就不显示文字说明 —— 一串不加字的美食照，更像手机相册 */
+const FOOD_PHOTOS = [
+  { photo:'photos/f1.jpg' }, { photo:'photos/f2.jpg' },
+  { photo:'photos/f3.jpg' }, { photo:'photos/f4.jpg' },
+  { photo:'photos/f5.jpg' }, { photo:'photos/f6.jpg' },
+  { photo:'photos/f7.jpg' }, { photo:'photos/f8.jpg' }
+];
+
+/* ⑩ 以后要给你买的捏捏（color 是颜色，点一下会弹） */
+const SQUISHIES = [
+  { color:'#F2C6C2' }, { color:'#F5DFA8' }, { color:'#BFD8CE' },
+  { color:'#D6C6E4' }, { color:'#F3C79C' }
+];
+
+/* ⑪ 以后要给你买的裙子：Lolita 那种 —— 蓬裙 + 两层蕾丝荷叶边 + 泡泡袖 +
+      胸前蝴蝶结。款式是重点，所以只画一条、不做配色切换。
+      你要是有一张她穿 Lolita 的照片，存成 photos/lolita.jpg，
+      这一格会自动从插画换成照片；没有照片就一直显示插画。 */
+const LOLITA_PHOTO = 'photos/lolita.jpg';
+
+/* ⑫ 信的落款（LETTER_SIGN 留空就不显示那一行） */
+const LETTER_DATE = '2026.10.17';
+const LETTER_SIGN = '';
+
+/* ⑬ 结尾彩蛋 */
+const SECRET_HTML = '我们要一起走很远很远的路';
+
+/* ============================================================
+   ——————————————  以下不用改  ——————————————
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const pad = n => String(n).padStart(2,'0');
+const start = new Date(START_DATE);
+let remeasure = () => {};   /* 分页尺寸重算 —— 脚本末尾才赋值，这里先占位 */
+
+/* 三座城市 + 「26 首歌」全站唯一来源 */
+$('cityPair').textContent = CITY_A.name + ' · ' + CITY_B.name;
+$('homeCity').textContent = CITY_HOME.name;
+document.querySelectorAll('.trip').forEach(el => el.textContent = TRIP_SONGS);
+document.querySelectorAll('.trip2').forEach(el => el.textContent = TRIP_SONGS * 2);
+
+/* ---------- 计时 ---------- */
+function split(ms){
+  return { d:Math.floor(ms/864e5), h:Math.floor(ms/36e5)%24, m:Math.floor(ms/6e4)%60, s:Math.floor(ms/1e3)%60 };
+}
+function tick(){
+  const a = split(Date.now() - start.getTime());
+  $('d').textContent = a.d; $('d2').textContent = a.d; $('dayNum').textContent = a.d;
+  $('h').textContent = a.h; $('m').textContent = pad(a.m); $('s').textContent = pad(a.s);
+}
+tick(); setInterval(tick, 1000);
+
+/* ---------- 故事书 ---------- */
+/* 打开时永远从封面开始 —— 不让浏览器恢复上次的滚动位置 */
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
+const track = $('track'), spine = $('spine'), viewport = $('viewport');
+function extraHTML(e){
+  if (!e) return '';
+  if (e.type === 'ticket')
+    return `<div class="extra"><div class="ticket"><div class="stub">${e.stub}</div>
+      <div class="info"><b>${e.title}</b><span>${e.note}</span></div></div></div>`;
+  if (e.type === 'chat')
+    return `<div class="extra"><div class="chat"><p class="who">${e.who}</p><p class="line">${e.line}</p></div></div>`;
+  if (e.type === 'phrase')
+    return `<div class="extra"><div class="phrase"><span>${e.label}</span><b>${e.text}</b></div></div>`;
+  return '';
+}
+STORY.forEach((s, i) => {
+  const page = document.createElement('div');
+  page.className = 'page' + (i === 0 ? ' active' : '');
+  page.innerHTML = `
+    <p class="when">${s.date}</p><h3>${s.title}</h3><p class="text">${s.text}</p>
+    <div class="polaroid">
+      <div class="shot">
+        <img src="${s.photo}" alt="${s.title}" decoding="async" draggable="false">
+        <div class="hint">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
+            <path d="M3 8h3l2-3h8l2 3h3v11H3V8z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="12" cy="13.5" r="3.2" stroke="currentColor" stroke-width="1.5"/>
+          </svg>放一张你们的照片<br>${s.photo}</div>
+      </div>
+      <p class="caption">${s.date} · ${s.title}</p>
+      <div class="back"><span>${s.back}<small>${s.date}</small></span></div>
+    </div>${extraHTML(s.extra)}`;
+  track.appendChild(page);
+  const b = document.createElement('button');
+  b.innerHTML = `<i></i><u>${s.date.slice(2)}</u>`;
+  b.addEventListener('click', () => go(i));
+  spine.appendChild(b);
+});
+$('total').textContent = STORY.length;
+track.querySelectorAll('img').forEach(img => {
+  const ok = () => {
+    img.classList.add('ok');
+    /* 横图把拍立得放宽一点，不然 300px 的框里只剩一条细长条 */
+    if (img.naturalWidth > img.naturalHeight) img.closest('.polaroid').classList.add('wide');
+    fit();
+  };
+  const no = () => img.classList.remove('ok');
+  /* 缓存命中时 complete 已经是 true，但 fit() 此刻还没定义，推迟一个任务再判 */
+  if (img.complete) setTimeout(() => (img.naturalWidth > 0 ? ok() : no()), 0);
+  img.addEventListener('load', ok); img.addEventListener('error', no);
+});
+
+let idx = 0;
+/* 视口高度跟着「当前这一页」走，而不是取所有页里最高的一页。
+   取最高值的话，横图那两页（电影 / 一周年）下面会空出一大块。 */
+const fit = () => {
+  const p = track.children[idx];
+  if (p) viewport.style.height = p.offsetHeight + 'px';
+  remeasure();                 /* 故事书一高一矮，后面几屏的位置跟着变 */
+};
+/* 只横向滚书脊那一条，绝不动页面的垂直位置
+   （用 scrollIntoView 的话，初始化时会连带把整页滚到故事书那一屏） */
+function spineTo(i){
+  const b = spine.children[i];
+  if (!b) return;
+  spine.scrollTo({ left: b.offsetLeft - (spine.clientWidth - b.offsetWidth) / 2, behavior:'smooth' });
+}
+function go(n){
+  idx = Math.max(0, Math.min(STORY.length - 1, n));
+  track.style.transform = `translateX(-${idx * 100}%)`;
+  [...track.children].forEach((p, i) => p.classList.toggle('active', i === idx));
+  [...spine.children].forEach((b, i) => b.classList.toggle('on', i === idx));
+  $('cur').textContent = idx + 1;
+  $('prev').disabled = idx === 0; $('next').disabled = idx === STORY.length - 1;
+  spineTo(idx);
+  fit();
+}
+$('prev').onclick = () => go(idx - 1);
+$('next').onclick = () => go(idx + 1);
+window.addEventListener('resize', fit);
+
+let x0 = null, y0 = null, moved = false;
+viewport.addEventListener('touchstart', e => { x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; moved = false; }, { passive:true });
+viewport.addEventListener('touchmove', e => { if (x0 !== null && Math.abs(e.touches[0].clientX - x0) > 12) moved = true; }, { passive:true });
+viewport.addEventListener('touchend', e => {
+  if (x0 === null || !moved) return;
+  const dx = e.changedTouches[0].clientX - x0, dy = e.changedTouches[0].clientY - y0;
+  if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+  x0 = null;
+});
+track.addEventListener('click', e => {
+  if (moved) return;
+  const p = e.target.closest('.polaroid'); if (p) p.classList.toggle('flipped');
+});
+
+/* ---------- 地图 ---------- */
+const mapwrap = $('mapwrap'), placeBox = $('place');
+const put = (name, x, y, cls) => {
+  const p = document.createElement('div');
+  p.className = 'pin ' + cls;
+  p.style.left = x + '%'; p.style.top = (y / 72 * 100) + '%';
+  p.innerHTML = `<span class="dot"></span><span class="tag">${name}</span>`;
+  mapwrap.appendChild(p); return p;
+};
+put(CITY_HOME.name, CITY_HOME.x, CITY_HOME.y, 'city');
+put(CITY_A.name, CITY_A.x, CITY_A.y, 'city');
+put(CITY_B.name, CITY_B.x, CITY_B.y, 'city');
+
+PLACES.forEach(pl => {
+  const pin = put(pl.name, pl.x, pl.y, 'small lit');
+  pin.addEventListener('click', () => {
+    mapwrap.querySelectorAll('.pin').forEach(p => p.classList.remove('on'));
+    pin.classList.add('on');
+    placeBox.innerHTML = `<div class="ph">
+      ${pl.photo ? `<img src="${pl.photo}" alt="${pl.name}" loading="lazy" decoding="async">` : `<div class="phbox"></div>`}
+      <div><p class="when">${pl.when}</p><h4>${pl.name}</h4></div></div><p>${pl.text}</p>`;
+    const im = placeBox.querySelector('img');
+    if (im) im.addEventListener('error', () => { const d = document.createElement('div'); d.className = 'phbox'; im.replaceWith(d); });
+    placeBox.classList.add('show');
+  });
+});
+
+/* ---------- 味道 ---------- */
+const foodList = $('foodList');
+FOODS.forEach(f => {
+  const li = document.createElement('li');
+  if (!f.done) li.className = 'todo';
+  li.innerHTML = `<span class="lead">${f.done ? '✓' : '□'}</span>
+    <span class="dish"><b>${f.dish}</b><span>${f.note}</span></span>
+    <span class="where">${f.where}</span>`;
+  foodList.appendChild(li);
+});
+$('foodFoot').textContent = `吃过 ${FOODS.filter(f => f.done).length} · 还欠 ${FOODS.filter(f => !f.done).length}`;
+
+/* ---------- 声音 ---------- */
+const audio = $('audio'), cassette = $('cassette'), bar = $('bar'), hint = $('tapeHint');
+let cur = -1;
+SONGS.forEach((s, i) => {
+  const li = document.createElement('li');
+  li.innerHTML = `<span class="no">${pad(i + 1)}</span>
+    <span class="t"><b>${s.title}</b><span>${s.artist}</span></span>
+    <span class="mark"></span>`;
+  li.addEventListener('click', () => play(i));
+  $('songList').appendChild(li);
+});
+function mark(){
+  [...$('songList').children].forEach((li, i) => li.classList.toggle('on', i === cur));
+}
+function play(i){
+  const s = SONGS[i];
+  if (cur === i && !audio.paused){ audio.pause(); return; }
+  cur = i; mark();
+  $('tapeTitle').textContent = s.title + ' · ' + s.artist;
+  $('nowTitle').textContent = s.title;
+  $('nowArtist').textContent = s.artist;
+  $('nowNote').textContent = s.note;
+  hint.textContent = '';
+  audio.src = s.file; audio.play().catch(() => {});
+}
+audio.addEventListener('playing', () => cassette.classList.add('playing'));
+audio.addEventListener('pause',   () => cassette.classList.remove('playing'));
+const timeDisp = $('timeDisp');
+const mmss = t => (!isFinite(t) || t <= 0) ? '--:--' : Math.floor(t / 60) + ':' + pad(Math.floor(t % 60));
+audio.addEventListener('loadedmetadata', () => { timeDisp.textContent = '0:00 / ' + mmss(audio.duration); });
+audio.addEventListener('timeupdate', () => {
+  if (audio.duration){
+    bar.style.width = (audio.currentTime / audio.duration * 100) + '%';
+    timeDisp.textContent = mmss(audio.currentTime) + ' / ' + mmss(audio.duration);
+  }
+});
+audio.addEventListener('error',   () => {
+  cassette.classList.remove('playing');
+  bar.style.width = '0%';
+  timeDisp.textContent = '0:00 / --:--';
+  hint.textContent = '还没放这首歌 —— 把它存到 ' + (SONGS[cur] ? SONGS[cur].file : 'songs/') + ' 就能播了';
+});
+audio.addEventListener('ended', () => { bar.style.width = '0%'; timeDisp.textContent = '0:00 / ' + mmss(0); if (cur < SONGS.length - 1) play(cur + 1); });
+
+/* ---------- 隔着屏幕的日常 ---------- */
+function wireImg(im){
+  const ok = () => im.classList.add('ok'), no = () => im.classList.remove('ok');
+  if (im.complete) (im.naturalWidth > 0 ? ok() : no)();
+  im.addEventListener('load', ok); im.addEventListener('error', no);
+}
+const SNAP_ICON = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+  <rect x="3" y="4.5" width="18" height="15" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+  <circle cx="9" cy="10" r="1.5" fill="currentColor"/>
+  <path d="M4 16.5l4.5-4 3.5 3 3-2.5L20 16.5" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>`;
+const snapBox = $('snaps');
+SNAPS.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'snap' + (s.kind === 'music' ? ' dark' : '') + (s.wide ? ' wide' : '');
+  d.innerHTML = `
+    <div class="bar-top"><i></i>${s.label}</div>
+    <div class="shotbox">
+      <img src="${s.photo}" alt="截图" loading="lazy">
+      <div class="hint">${SNAP_ICON}放一张截图<br>${s.photo}</div>
+    </div>
+    <p class="cap">${s.cap}</p>`;
+  snapBox.appendChild(d);
+  wireImg(d.querySelector('img'));
+});
+
+/* ---------- 美食照片 ---------- */
+const strip = $('filmstrip');
+FOOD_PHOTOS.forEach(f => {
+  const d = document.createElement('div');
+  d.className = 'film';
+  d.innerHTML = `<div class="box"><img src="${f.photo}" alt="一起吃过的东西" loading="lazy">
+    <div class="hint">放一张<br>美食照片</div></div>${f.name ? `<p>${f.name}</p>` : ''}`;
+  strip.appendChild(d);
+  wireImg(d.querySelector('img'));
+});
+
+/* ---------- 地图去过几个地方 ---------- */
+$('mapFoot').innerHTML = `这两年，一起去过 <b>${PLACES.length}</b> 座城市`;
+
+/* ---------- 以后要给你买的东西 ---------- */
+const squishBox = $('squishBox');
+let squishN = 0;
+SQUISHIES.forEach(s => {
+  const b = document.createElement('button');
+  b.style.setProperty('--c', s.color);
+  b.setAttribute('aria-label', '捏一下');
+  b.innerHTML = '<i></i><u></u><b></b>';
+  b.addEventListener('click', () => {
+    b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit');
+    $('squishCount').textContent = ++squishN;
+  });
+  squishBox.appendChild(b);
+});
+
+/* ---------- 裙子：Lolita ---------- */
+const lolitaBox = $('lolitaBox');
+/* 款式才是重点：钟形蓬裙 + 两层蕾丝荷叶边 + 泡泡袖 + 胸前蝴蝶结。
+   上一版的问题（截图确认过）：泡泡袖是两个凸起，读成"耳朵"，整体像个罐子。
+   这一版的关键差别：
+   ① 肩线收窄（29~51），泡泡袖向下垂而不是向上翘 —— 袖子在裙身侧面，不在头顶；
+   ② 腰上一条明显的蓝缎带，把"上身"和"蓬裙"切开，一眼读出连衣裙的层次；
+   ③ 蝴蝶结放大到胸口宽度的一半，有翅膀有结心；
+   ④ 裙摆加宽到 65，钟形更夸张，Lolita 的"蓬"才出得来。
+   仍然是一条连续轮廓 path —— 孤立部件是小尺寸插画最大的破功源。 */
+lolitaBox.innerHTML = `<div class="frame"><svg viewBox="0 8 80 74" fill="none">
+    <path d="M33 12 Q40 15.5 47 12
+             C51.5 11.5 55 13 56.8 17 C58.6 21.8 57 27.6 52 29.8
+             C50.6 30.4 49.2 30.3 48.2 29.7 L47 31
+             C52.5 41.5 61.5 53 65 62 C68.5 71 62 76.5 40 76.5
+             C18 76.5 11.5 71 15 62 C18.5 53 27.5 41.5 33 31 L31.8 29.7
+             C30.8 30.3 29.4 30.4 28 29.8 C23 27.6 21.4 21.8 23.2 17
+             C25 13 28.5 11.5 33 12 Z"
+          fill="#F7F1E8" stroke="#E2D6C4" stroke-width="1.2" stroke-linejoin="round"/>
+    <path d="M31.5 29.5 L48.5 29.5 L48 35 L32 35 Z" fill="#C3D5E1"/>
+    <path d="M24 48 Q28 53.5 32 48 Q36 53.5 40 48 Q44 53.5 48 48 Q52 53.5 56 48"
+          stroke="#FFFFFF" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17.5 63 Q21.5 68.6 25.5 63 Q29.5 68.6 33.5 63 Q37.5 68.6 41.5 63 Q45.5 68.6 49.5 63 Q53.5 68.6 57.5 63 Q61.5 68.6 62.5 66"
+          stroke="#FFFFFF" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M40 18.5 L29.5 13.5 L31 23.5 Z" fill="#C3D5E1"/>
+    <path d="M40 18.5 L50.5 13.5 L49 23.5 Z" fill="#C3D5E1"/>
+    <circle cx="40" cy="18.5" r="3.2" fill="#B4CAD9"/>
+  </svg></div>`;
+/* photos/lolita.jpg 一旦存在，就自动把插画换成照片（同样装进相纸框里） */
+const loliImg = new Image();
+loliImg.alt = '她的 Lolita';
+loliImg.onload = () => {
+  const f = document.createElement('div');
+  f.className = 'frame';
+  f.appendChild(loliImg);
+  lolitaBox.innerHTML = '';
+  lolitaBox.appendChild(f);
+};
+loliImg.src = LOLITA_PHOTO;
+
+/* ---------- 滚动淡入 ---------- */
+const io = new IntersectionObserver(es => {
+  es.forEach(en => { if (en.isIntersecting){ en.target.classList.add('in'); io.unobserve(en.target); } });
+}, { threshold:.18, rootMargin:'0px 0px -6% 0px' });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ---------- 彩蛋 ---------- */
+$('secretText').innerHTML = SECRET_HTML;
+$('unlock').addEventListener('click', () => {
+  const s = $('secret'); s.classList.add('open');
+  setTimeout(() => s.scrollIntoView({ behavior:'smooth', block:'center' }), 260);
+});
+
+/* ---------- 信的落款 ---------- */
+$('letterDate').textContent = LETTER_DATE;
+$('letterWhere').textContent = LETTER_SIGN;
+
+/* ---------- 顶部阅读进度 ---------- */
+const pbar = $('pbar');
+const onScroll = () => {
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  pbar.style.width = (h > 0 ? Math.min(100, window.scrollY / h * 100) : 0) + '%';
+};
+window.addEventListener('scroll', onScroll, { passive:true });
+window.addEventListener('resize', onScroll);
+onScroll();
+
+/* ---------- 点哪都飘一颗心 ---------- */
+document.addEventListener('click', e => {
+  if (e.target.closest('button, a, input, textarea, select')) return;
+  const ht = document.createElement('span');
+  ht.className = 'heart';
+  ht.textContent = '♥';
+  ht.style.left = e.clientX + 'px';
+  ht.style.top  = e.clientY + 'px';
+  document.body.appendChild(ht);
+  setTimeout(() => ht.remove(), 1300);
+});
+
+/* ---------- 浮尘 ---------- */
+for (let i = 0; i < 16; i++){
+  const d = document.createElement('i'), s = 2 + Math.random() * 4;
+  d.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;
+    animation-duration:${10 + Math.random()*12}s;animation-delay:${-Math.random()*14}s;`;
+  $('dust').appendChild(d);
+}
+
+/* ============================================================
+   一屏一屏翻
+   ————————————————————————————————————————————
+   滚轮 / 触摸 / 方向键都由这里接管：一次手势只走一屏，动画走完才解锁。
+   比一屏高的分区（地图 / 味道 / 信 …）在屏内自由滚，滚到边界再翻下一屏。
+   ============================================================ */
+const screens = [...document.querySelectorAll('.album > header, .album > section')];
+const still   = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let page = 0, tops = [], lock = 0;
+let vh = window.innerHeight;   /* 真实可视高度，全站「一屏」就按它算 */
+
+const topOf    = el => el.getBoundingClientRect().top + window.scrollY;
+const tooTall  = el => !el.classList.contains('fits');                // 一屏装不下
+const atBottom = el => window.scrollY + vh >= topOf(el) + el.offsetHeight - 3;
+const atTop    = el => window.scrollY <= topOf(el) + 3;
+
+/* 内容高度会变（图片加载、故事书翻页）：重算每屏位置，并给"一屏装得下"的
+   分区补上 .fits（居中）。只切 justify-content、不动 min-height，所以不会
+   让文档变高变矮，也就不会把浏览器的滚动位置顶掉。 */
+remeasure = () => {
+  screens.forEach(el => el.classList.toggle('fits', el.offsetHeight <= vh + 4));
+  tops = screens.map(topOf);
+};
+
+/* 可视高度变了（横竖屏、拖窗口、手机地址栏收起）：
+   重写 --vh 并保持"当前读到哪儿"，而不是弹回这一屏的顶部 ——
+   否则在「味道」这种长屏里读到一半，地址栏一收就被甩回开头。 */
+function setVH(){
+  const h = window.innerHeight;
+  if (h === vh) return;
+  const keep = screens[page] ? Math.max(0, window.scrollY - topOf(screens[page])) : 0;
+  vh = h;
+  document.documentElement.style.setProperty('--vh', h + 'px');
+  remeasure();
+  if (screens[page]) window.scrollTo(0, tops[page] + keep);
+}
+document.documentElement.style.setProperty('--vh', vh + 'px');
+
+function goto(n, smooth = true){
+  page = Math.max(0, Math.min(screens.length - 1, n));
+  lock = (smooth && !still) ? Date.now() + 640 : 0;
+  window.scrollTo({ top: topOf(screens[page]), behavior: (smooth && !still) ? 'smooth' : 'auto' });
+}
+
+/* 手指 / 滚轮停下时把 page 校准回真实位置（万一有人拖了滚动条）
+   自动翻页那一下正在滚，别插手，否则会把 page 拽回出发的那一屏 */
+let ticking = 0;
+window.addEventListener('scroll', () => {
+  if (ticking) return;
+  ticking = requestAnimationFrame(() => {
+    ticking = 0;
+    if (Date.now() < lock) return;
+    const y = window.scrollY;
+    let best = 0;
+    for (let i = 0; i < tops.length; i++) if (tops[i] <= y + 8) best = i;
+    page = best;
+  });
+}, { passive:true });
+
+let acc = 0, accAt = 0;
+window.addEventListener('wheel', e => {
+  if (e.ctrlKey) return;                                  // 手势缩放，不拦
+  const el = screens[page], down = e.deltaY > 0;
+  if (tooTall(el)){                                       // 屏里还有内容，让它自己滚
+    if (down && !atBottom(el)) { acc = 0; return; }
+    if (!down && !atTop(el))   { acc = 0; return; }
+  }
+  e.preventDefault();
+  if (Date.now() < lock) return;
+  if (Date.now() - accAt > 280) acc = 0;                  // 停顿一下就重新累积
+  accAt = Date.now(); acc += e.deltaY;
+  if (Math.abs(acc) < 30) return;                         // 攒够一格的量才翻，免得一碰就跑
+  const dir = acc > 0 ? 1 : -1;
+  acc = 0;
+  goto(page + dir);
+}, { passive:false });
+
+let ty = null, tx = null;
+window.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) { ty = null; return; }
+  ty = e.touches[0].clientY; tx = e.touches[0].clientX;
+}, { passive:true });
+window.addEventListener('touchend', e => {
+  if (ty === null) return;
+  const dy = e.changedTouches[0].clientY - ty, dx = e.changedTouches[0].clientX - tx;
+  ty = null;
+  if (Math.abs(dx) > Math.abs(dy) || Math.abs(dy) < 46) return;   // 横向手势交给故事书
+  if (Date.now() < lock) return;
+  const el = screens[page], down = dy < 0;
+  if (tooTall(el)){
+    if (down && !atBottom(el)) return;
+    if (!down && !atTop(el))   return;
+  }
+  goto(page + (down ? 1 : -1));
+}, { passive:true });
+
+window.addEventListener('keydown', e => {
+  const down = e.key === 'ArrowDown' || e.key === 'PageDown' || e.key === ' ' || e.key === 'Spacebar';
+  const up   = e.key === 'ArrowUp'   || e.key === 'PageUp';
+  if (!down && !up) return;
+  const tag = document.activeElement ? document.activeElement.tagName : '';
+  if (/^(INPUT|TEXTAREA)$/.test(tag)) return;
+  if (e.key === ' ' && /^(BUTTON|A)$/.test(tag)) return;   // 空格留给按钮
+  const el = screens[page];
+  if (tooTall(el)){
+    if (down && !atBottom(el)) return;
+    if (up && !atTop(el))      return;
+  }
+  e.preventDefault();
+  goto(page + (down ? 1 : -1));
+});
+
+/* 图片加载完分区会变高，合并到一帧里重算一次 */
+let raf = 0;
+const later = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; remeasure(); }); };
+document.addEventListener('load', later, true);
+
+let rto = 0;
+window.addEventListener('resize', () => {
+  clearTimeout(rto);
+  rto = setTimeout(() => { setVH(); remeasure(); }, 180);
+});
+window.addEventListener('orientationchange', () => setTimeout(() => { vh = 0; setVH(); remeasure(); }, 260));
+
+go(0); fit(); remeasure();
+/* 永远从封面开始：上面已关掉浏览器的滚动位置恢复，这里再显式回顶 */
+window.addEventListener('load', () => { fit(); remeasure(); goto(0, false); });
+setTimeout(() => { fit(); remeasure(); }, 400);
+setTimeout(remeasure, 1600);
+</script>
+</body>
+</html>
